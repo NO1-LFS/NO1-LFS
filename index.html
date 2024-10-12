@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>导航栏</title>
+    <style>
+      body {
+        background: url(./bg.jpg) no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+      }
+      .nav {
+        height: 40px;
+        background-color: #333;
+        box-shadow: 0 1px 2px #666;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+        list-style: none;
+      }
+      .btli {
+        float: right;
+        width: 80px;
+        line-height: 40px;
+        text-align: center;
+      }
+      .navlist a {
+        color: #fff;
+        display: block;
+      }
+      .navlist a:hover {
+        background: yellowgreen;
+      }
+      .droplist {
+        background-color: #333;
+        box-shadow: 0 1px 2px #333;
+        display: none;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .btli:hover .droplist {
+        display: block;
+      }
+      .droplist li {
+        border-top: 1px solid #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <ur class="navlist">
+        <li class="btli">
+          <a href="#">导航项</a>
+          <ul class="droplist">
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+          </ul>
+        </li>
+        <li class="btli">
+          <a href="#">导航项</a>
+          <ul class="droplist">
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+          </ul>
+        </li>
+        <li class="btli">
+          <a href="#">导航项</a>
+          <ul class="droplist">
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+          </ul>
+        </li>
+        <li class="btli">
+          <a href="#">导航项</a>
+          <ul class="droplist">
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+          </ul>
+        </li>
+        <li class="btli">
+          <a href="#">导航项</a>
+          <ul class="droplist">
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+            <li><a href="#">下拉框</a></li>
+          </ul>
+        </li>
+      </ur>
+    </div>
+  </body>
+</html>
