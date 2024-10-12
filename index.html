@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>导航栏</title>
+    <title>枫</title>
     <style>
       body {
         background: url(./bg.jpg) no-repeat;
@@ -47,11 +47,34 @@
       .droplist li {
         border-top: 1px solid #666;
       }
+      #div {
+        position: absolute;
+        top: 60px;
+        left: 70%;
+        transform: translate(-50%, 0);
+        padding: 15px; /* 调整内边距 */
+        background-color: rgba(0, 0, 0, 0.7); /* 稍微降低透明度 */
+        color: #fff;
+        font-size: 1.5em; /* 调整字体大小 */
+        text-align: center;
+        border-radius: 10px; /* 调整圆角 */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 降低阴影效果 */
+      }
+
+      #weather {
+        font-size: 1em; /* 调整天气信息的字体大小 */
+        margin: 5px 0; /* 调整上下间距 */
+        padding: 8px; /* 调整内边距 */
+        background-color: rgba(255, 255, 255, 0.2); /* 保持半透明白色背景 */
+        border-radius: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.3); /* 调整边框透明度 */
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* 降低阴影效果 */
+      }
     </style>
   </head>
   <body>
     <div class="nav">
-      <ur class="navlist">
+      <ul class="navlist">
         <li class="btli">
           <a href="#">导航项</a>
           <ul class="droplist">
@@ -97,7 +120,70 @@
             <li><a href="#">下拉框</a></li>
           </ul>
         </li>
-      </ur>
+      </ul>
     </div>
+    <div id="div">
+      <div id="weather"></div>
+    </div>
+    <script>
+      function myDate() {
+        try {
+          var now = new Date();
+          var formattedDate =
+            now.getFullYear() +
+            "年" +
+            (now.getMonth() + 1) +
+            "月" +
+            now.getDate() +
+            "日 " +
+            now.getHours() +
+            " : " +
+            now.getMinutes() +
+            " : " +
+            now.getSeconds();
+
+          // 更新日期信息
+          document.getElementById("div").childNodes[0].nodeValue =
+            formattedDate; // 只更新时钟部分
+          // 获取天气信息
+          getWeather(); // 执行获取天气信息的函数
+        } catch (error) {
+          console.error("获取日期失败:", error);
+          document.getElementById("weather").innerHTML = "获取日期失败"; // 只更新天气部分
+        }
+      }
+
+      function getWeather() {
+        const apiKey = "7a8a07876898ed17efe475981824d003"; // 替换为您的API密钥
+        const city = "beijing"; // 替换为您的城市名
+
+        // 使用fetch从天气API获取数据
+        fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=zh&units=metric`
+        )
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("网络响应不是OK");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const temperature = Math.round(data.main.temp); // 取整温度
+            const weatherDescription = data.weather[0].description; // 获取天气描述
+            const weatherInfo = `当前温度: ${temperature}°C, 天气状况: ${weatherDescription}`;
+            document.getElementById("weather").innerHTML = weatherInfo; // 只更新天气信息部分
+          })
+          .catch((error) => {
+            console.error("获取天气失败:", error);
+            document.getElementById("weather").innerHTML = "获取天气失败"; // 显示失败信息
+          });
+      }
+    </script>
   </body>
+  <script>
+    window.onload = function () {
+      myDate(); // 页面加载完成后调用
+      setInterval(myDate, 1000); // 每秒更新一次时钟
+    };
+  </script>
 </html>
