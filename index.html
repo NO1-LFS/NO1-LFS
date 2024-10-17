@@ -1,189 +1,367 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>枫</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <title>动态音乐播放器</title>
     <style>
       body {
-        background: url(./bg.jpg) no-repeat;
-        background-size: cover;
-        background-attachment: fixed;
-      }
-      .nav {
-        height: 40px;
-        background-color: #333;
-        box-shadow: 0 1px 2px #666;
-      }
-      * {
-        margin: 0;
-        padding: 0;
-        text-decoration: none;
-        list-style: none;
-      }
-      .btli {
-        float: right;
-        width: 80px;
-        line-height: 40px;
-        text-align: center;
-      }
-      .navlist a {
-        color: #fff;
-        display: block;
-      }
-      .navlist a:hover {
-        background: yellowgreen;
-      }
-      .droplist {
-        background-color: #333;
-        box-shadow: 0 1px 2px #333;
-        display: none;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      .btli:hover .droplist {
-        display: block;
-      }
-      .droplist li {
-        border-top: 1px solid #666;
-      }
-      #div {
-        position: absolute;
-        top: 60px;
-        left: 70%;
-        transform: translate(-50%, 0);
-        padding: 15px; /* 调整内边距 */
-        background-color: rgba(0, 0, 0, 0.7); /* 稍微降低透明度 */
-        color: #fff;
-        font-size: 1.5em; /* 调整字体大小 */
-        text-align: center;
-        border-radius: 10px; /* 调整圆角 */
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 降低阴影效果 */
+        font-family: "Arial", sans-serif;
+        margin: 0; /* 去掉默认边距 */
+        padding: 0; /* 去掉默认内边距 */
       }
 
-      #weather {
-        font-size: 1em; /* 调整天气信息的字体大小 */
-        margin: 5px 0; /* 调整上下间距 */
-        padding: 8px; /* 调整内边距 */
-        background-color: rgba(255, 255, 255, 0.2); /* 保持半透明白色背景 */
-        border-radius: 5px;
-        border: 1px solid rgba(255, 255, 255, 0.3); /* 调整边框透明度 */
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* 降低阴影效果 */
+      .music-player {
+        background-color: rgba(0, 0, 0, 0.9); /* 更深一点的背景色 */
+        border-radius: 12px;
+        padding: 20px;
+        width: 360px; /* 稍微增加宽度 */
+        margin: 20px auto; /* 居中 */ 
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7); /* 加强阴影效果 */
+        color: white;
       }
+
+      .music-player .title {
+        text-align: left;
+        font-size: 1.5em; /* 增加标题字体大小 */
+        margin-bottom: 10px;
+        color: whitesmoke; /* 标题颜色 */
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      .control-button {
+        background-color: #444; /* 按钮背景色 */
+        border: none;
+        border-radius: 8px; /* 圆角效果 */
+        color: yellowgreen;
+        font-size: 1.5em;
+        cursor: pointer;
+        margin: 0 10px;
+        padding: 10px 15px; /* 增加内边距 */
+        transition: transform 0.3s, background-color 0.3s; /* 增加过渡效果 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* 增加阴影 */
+      }
+
+      .control-button:hover {
+        background-color: #666; /* 增加悬停效果 */
+        transform: scale(1.1); /* 鼠标悬停放大效果 */
+      }
+
+      .current-song {
+        font-weight: bold;
+        margin: 15px 0;
+        color: #ffcc00; /* 当前歌曲颜色 */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      }
+      .music-list {
+        list-style: none; /* 去掉默认列表样式 */
+        width: 300px;
+        padding: 10px; /* 增加内边距 */
+        margin: 0; /* 去掉外边距 */
+        background-color: rgba(0, 0, 0, 0.7); /* 列表背景色 */
+        border-radius: 10px; /* 圆角 */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* 阴影效果 */
+        max-height: 250px; /* 设置最大高度 */
+        overflow-y: auto; /* 超出时滚动 */
+        margin: 20px auto 0; /* 设置上边距，居中对齐 */
+      }
+
+      .music-list li {
+        cursor: pointer;
+        padding: 10px 15px; /* 增加内边距 */
+        border-radius: 8px; /* 列表项圆角 */
+        transition: background 0.3s, color 0.3s; /* 平滑过渡效果 */
+        font-size: 1.1em; /* 调整字体大小 */
+        color: white; /* 字体颜色 */
+      }
+
+      .music-list li:hover {
+        background: rgba(255, 255, 255, 0.2); /* 列表项悬停背景效果 */
+        color: yellowgreen; /* 悬停时字体颜色 */
+      }
+      /* 按钮样式 */
+      .show-list-button {
+        background-color: #444; /* 按钮背景色 */
+        border: none;
+        border-radius: 8px; /* 圆角效果 */
+        color: yellowgreen;
+        font-size: 1.5em;
+        cursor: pointer;
+        margin: 0 10px;
+        padding: 10px 15px; /* 增加内边距 */
+        transition: transform 0.3s, background-color 0.3s; /* 增加过渡效果 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* 增加阴影 */
+      }
+      /* 悬停时的效果 */
+      .show-list-button:hover {
+        transform: scale(1.1); /* 鼠标悬停放大效果 */
+        background-color: #666; /* 增加悬停效果 */
+      }
+      .slider-container {
+        display: none; /* 默认隐藏 */
+        width: 30px; /* 调整容器宽度 */
+        height: 100px; /* 调整容器高度，确保能包含滑块 */
+        position: relative;
+        top: -75px; /* 调整位置 */
+        left: -36px;
+        flex-direction: column; /* 垂直排列 */
+        align-items: center; /* 水平居中对齐 */
+        justify-content: center; /* 垂直居中对齐 */
+        border: 2px solid yellowgreen; /* 外框颜色 */
+        border-radius: 5px; /* 圆角 */
+        background-color: rgba(223, 216, 216, 0.8); /* 背景颜色（可调整） */
+      }
+
+      .volume-slider {
+        width: 10px;
+        height: 80px;
+        cursor: pointer;
+        -webkit-appearance: slider-vertical;
+        border: none;
+        background: transparent;
+      }
+
+      .volume-icon {
+        background-color: #444; /* 按钮背景色 */
+        position: relative;
+        left: 10px;
+        width: 20px;
+        height: 25px;
+        border: none;
+        border-radius: 8px; /* 圆角效果 */
+        color: yellowgreen;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 10px 20px 9px 10px; /* 增加内边距 */
+        transition: transform 0.3s, background-color 0.3s; /* 增加过渡效果 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* 增加阴影 */
+      }
+#lyrics-modal {
+  display: none; /* 默认隐藏 */
+  position: fixed; /* 固定定位 */
+  z-index: 1000; /* 确保在最上层 */
+  left: 0;
+  top: 0;
+  width: 100%; /* 100%宽度 */
+  height: 100%; /* 100%高度 */
+  overflow: auto; /* 启用滚动 */
+  background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
+}
+
+.modal-content {
+  background-color: #fefefe; /* 内容背景 */
+  margin: 15% auto; /* 中心对齐 */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* 设定宽度 */
+  border-radius: 10px; /* 圆角 */
+}
+
+.close-button {
+  color: #aaa; /* 关闭按钮颜色 */
+  float: right; /* 右对齐 */
+  font-size: 28px; /* 字号 */
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: red; /* 悬停颜色 */
+  text-decoration: none;
+  cursor: pointer;
+}
+
     </style>
   </head>
   <body>
-    <div class="nav">
-      <ul class="navlist">
-        <li class="btli">
-          <a href="#">导航项</a>
-          <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-          </ul>
+    <div class="music-player">
+  <div class="title" style="display: flex; align-items: center;">
+    <span>当前播放：</span>
+    <div class="current-song" id="current-song" style="margin-left: 10px;">无</div>
+  </div>
+      <audio id="audio-player">
+        <source id="audio-source" src="" type="audio/mp3" />
+        你的浏览器不支持音频元素。
+      </audio>
+<div class="controller" style="display: flex; align-items: center;">
+  <button class="control-button" id="prev-button" style="margin-right: 15px">
+    <i class="fas fa-step-backward"></i>
+  </button>
+  <button class="control-button" id="play-button" style="margin-right: 15px">
+    <i class="fas fa-play"></i>
+  </button>
+  <button class="control-button" id="next-button" style="margin-right: 15px">
+    <i class="fas fa-step-forward"></i>
+  </button>
+  <button class="show-list-button" id="show-list-button" style="margin-right: 15px">
+    <i class="fas fa-list"></i>
+  </button>
+  <div class="controller" style="display: flex; align-items: center;">
+  <i id="volume-icon" class="fas fa-volume-up volume-icon" style="margin-right: 5px;"></i>
+  <div class="slider-container">
+    <input type="range" class="volume-slider" id="volume-control" min="0" max="100" value="0" />
+    <div id="volume-percentage" style="font-size: 0.8em; color: white;">0%</div>
+  </div>
+</div>
+</div>
+      </div>
+      <ul class="music-list" id="music-list" style="display: none">
+        <li data-src="./music/周杰伦-一路向北.mp3">一路向北</li>
+        <li data-src="./music/周杰伦-枫.mp3">枫</li>
+        <li data-src="./music/周杰伦-晴天.mp3">晴天</li>
+        <li data-src="./music/周杰伦-手写的从前.mp3">手写的从前</li>
+        <li data-src="./music/周杰伦-简单爱.mp3">简单爱</li>
+        <li data-src="./music/周杰伦-轨迹.mp3">轨迹</li>
+        <li data-src="./music/G.E.M.邓紫棋-多远都要在一起.mp3">
+          多远都要在一起
         </li>
-        <li class="btli">
-          <a href="#">导航项</a>
-          <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-          </ul>
-        </li>
-        <li class="btli">
-          <a href="#">导航项</a>
-          <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-          </ul>
-        </li>
-        <li class="btli">
-          <a href="#">导航项</a>
-          <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-          </ul>
-        </li>
-        <li class="btli">
-          <a href="#">导航项</a>
-          <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-          </ul>
-        </li>
+        <li data-src="./music/贺一航-请先说你好.mp3">请先说你好</li>
+        <li data-src="./music/G.E.M.邓紫棋-再见.mp3">再见</li>
+        <li data-src="./music/周杰伦-搁浅.mp3">搁浅</li>
+        <li data-src="./music/周杰伦-退后.mp3">退后</li>
+        <li data-src="./music/周杰伦&Lara梁心颐-珊瑚海.mp3">珊瑚海</li>
+        <li data-src="./music/周杰伦-反方向的钟.mp3">反方向的钟</li>
+        <li data-src="./music/筷子兄弟-老男孩.mp3">老男孩</li>
+        <li data-src="./music/周杰伦-七里香.mp3">七里香</li>
+        <li data-src="./music/周杰伦-花海.mp3">花海</li>
+        <li data-src="./music/庄心妍-再见只是陌生人.mp3">再见只是陌生人</li>
       </ul>
     </div>
-    <div id="div">
-      <div id="weather"></div>
-    </div>
+
     <script>
-      function myDate() {
-        try {
-          var now = new Date();
-          var formattedDate =
-            now.getFullYear() +
-            "年" +
-            (now.getMonth() + 1) +
-            "月" +
-            now.getDate() +
-            "日 " +
-            now.getHours() +
-            " : " +
-            now.getMinutes() +
-            " : " +
-            now.getSeconds();
+      const audioPlayer = document.getElementById("audio-player");
+      const audioSource = document.getElementById("audio-source");
+      const currentSong = document.getElementById("current-song");
+      const volumeIcon = document.getElementById("volume-icon");
+      const volumeControl = document.getElementById("volume-control");
+      const playButton = document.getElementById("play-button");
+      const nextButton = document.getElementById("next-button");
+      const prevButton = document.getElementById("prev-button");
+      const showListButton = document.getElementById("show-list-button");
+      const musicList = document.getElementById("music-list");
+      const sliderContainer = document.querySelector('.slider-container');
+      const volumePercentage = document.getElementById("volume-percentage");
+      const lyricsModal = document.getElementById("lyrics-modal");
+      const closeLyricsButton = document.getElementById("close-lyrics");
+      const songs = [
+        { title: "一路向北", src: "./music/周杰伦-一路向北.mp3" },
+        { title: "枫", src: "./music/周杰伦-枫.mp3" },
+        { title: "晴天", src: "./music/周杰伦-晴天.mp3" },
+        { title: "手写的从前", src: "./music/周杰伦-手写的从前.mp3" },
+        { title: "简单爱", src: "./music/周杰伦-简单爱.mp3" },
+        { title: "轨迹", src: "./music/周杰伦-轨迹.mp3" },
+        {
+          title: "多远都要在一起",
+          src: "./music/G.E.M.邓紫棋-多远都要在一起.mp3",
+        },
+        { title: "请先说你好", src: "./music/贺一航-请先说你好.mp3" },
+        { title: "再见", src: "./music/G.E.M.邓紫棋-再见.mp3" },
+        { title: "搁浅", src: "./music/周杰伦-搁浅.mp3" },
+        { title: "退后", src: "./music/周杰伦-退后.mp3" },
+        { title: "珊瑚海", src: "./music/周杰伦&Lara梁心颐-珊瑚海.mp3" },
+        { title: "反方向的钟", src: "./music/周杰伦-反方向的钟.mp3" },
+        { title: "老男孩", src: "./music/筷子兄弟-老男孩.mp3" },
+        { title: "七里香", src: "./music/周杰伦-七里香.mp3" },
+        { title: "花海", src: "./music/周杰伦-花海.mp3" },
+        { title: "再见只是陌生人", src: "./music/庄心妍-再见只是陌生人.mp3" },
+      ];
+      let currentSongIndex = 0;
+      let isPlaying = false; // 控制播放状态
+      let isInitialLoad = true; // 标识是否首次加载
 
-          // 更新日期信息
-          document.getElementById("div").childNodes[0].nodeValue =
-            formattedDate; // 只更新时钟部分
-          // 获取天气信息
-          getWeather(); // 执行获取天气信息的函数
-        } catch (error) {
-          console.error("获取日期失败:", error);
-          document.getElementById("weather").innerHTML = "获取日期失败"; // 只更新天气部分
+      // 页面加载时恢复音量
+      window.onload = () => {
+        const savedVolume = localStorage.getItem("volume");
+        if (savedVolume !== null) {
+          audioPlayer.volume = savedVolume; // 设置音量
+          volumeControl.value = savedVolume * 100; // 滑块匹配
         }
+      };
+
+      function loadSong(index) {
+        audioSource.src = songs[index].src;
+        currentSong.textContent = songs[index].title;
+        audioPlayer.load();
       }
 
-      function getWeather() {
-        const apiKey = "7a8a07876898ed17efe475981824d003"; // 替换为您的API密钥
-        const city = "beijing"; // 替换为您的城市名
+      playButton.addEventListener("click", () => {
+        if (isPlaying) {
+          audioPlayer.pause(); // 如果已经在播放，点击后暂停
+          playButton.innerHTML = '<i class="fas fa-play"></i>'; // 切换为播放图标
+        } else {
+          if (isInitialLoad) {
+            loadSong(currentSongIndex); // 首次点击时加载当前歌曲
+            audioPlayer.play(); // 播放当前歌曲
+            isInitialLoad = false; // 之后不再是首次加载
+          } else {
+            audioPlayer.play(); // 继续播放当前歌曲
+          }
+          playButton.innerHTML = '<i class="fas fa-pause"></i>'; // 切换为暂停图标
+        }
+        isPlaying = !isPlaying; // 切换播放状态
+      });
 
-        // 使用fetch从天气API获取数据
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=zh&units=metric`
-        )
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("网络响应不是OK");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            const temperature = Math.round(data.main.temp); // 取整温度
-            const weatherDescription = data.weather[0].description; // 获取天气描述
-            const weatherInfo = `当前温度: ${temperature}°C, 天气状况: ${weatherDescription}`;
-            document.getElementById("weather").innerHTML = weatherInfo; // 只更新天气信息部分
-          })
-          .catch((error) => {
-            console.error("获取天气失败:", error);
-            document.getElementById("weather").innerHTML = "获取天气失败"; // 显示失败信息
-          });
-      }
+      nextButton.addEventListener("click", () => {
+        currentSongIndex = (currentSongIndex + 1) % songs.length;
+        loadSong(currentSongIndex);
+        audioPlayer.play();
+        isPlaying = true; // 确保是播放状态
+      });
+
+      prevButton.addEventListener("click", () => {
+        currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+        loadSong(currentSongIndex);
+        audioPlayer.play();
+        isPlaying = true; // 确保是播放状态
+      });
+      style = "display: none; transform: rotate(270deg);";
+      // 更新音量和保存设置
+  volumeControl.addEventListener("input", () => {
+  const volume = volumeControl.value / 100; // 计算音量值
+  audioPlayer.volume = volume; // 设置音频播放器音量
+  volumePercentage.textContent = `${volumeControl.value}%`; // 更新音量百分比显示
+});
+        // 更新音量显示
+        volumeIcon.addEventListener("mouseover", () => {
+    sliderContainer.style.display = "flex"; // 显示滑块
+  });
+
+  volumeIcon.addEventListener("mouseout", () => {
+    sliderContainer.style.display = "none"; // 隐藏滑块
+  });
+
+  sliderContainer.addEventListener("mouseover", () => {
+    sliderContainer.style.display = "flex"; // 保持滑块显示
+  });
+
+  sliderContainer.addEventListener("mouseout", () => {
+    sliderContainer.style.display = "none"; // 继续隐藏滑块
+  });
+  showListButton.addEventListener("click", () => {
+  const isListVisible = musicList.style.display === "block"; // 检查当前状态
+  musicList.style.display = isListVisible ? "none" : "block"; // 切换显示状态
+});
+const musicItems = document.querySelectorAll('.music-list li');
+musicItems.forEach((item, index) => {
+  item.addEventListener('click', () => {
+    currentSongIndex = index; // 更新当前歌曲索引
+    loadSong(currentSongIndex); // 加载选中的歌曲
+    audioPlayer.play(); // 播放歌曲
+    isPlaying = true; // 确保播放状态为真
+    playButton.innerHTML = '<i class="fas fa-pause"></i>'; // 切换为暂停图标
+  });
+});
+audioPlayer.addEventListener("ended", () => {
+    currentSongIndex = (currentSongIndex + 1) % songs.length; // 更新当前歌曲索引，循环播放
+    loadSong(currentSongIndex); // 加载下一首歌曲
+    audioPlayer.play(); // 播放下一首歌曲
+    isPlaying = true; // 确保播放状态为真
+    playButton.innerHTML = '<i class="fas fa-pause"></i>'; // 切换为暂停图标
+});
     </script>
   </body>
-  <script>
-    window.onload = function () {
-      myDate(); // 页面加载完成后调用
-      setInterval(myDate, 1000); // 每秒更新一次时钟
-    };
-  </script>
 </html>
