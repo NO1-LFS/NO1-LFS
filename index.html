@@ -218,49 +218,39 @@
     <script>
 const apiKey = "7a8a07876898ed17efe475981824d003"; // 替换为您的API密钥
 
-// 翻译位置名称
-function translateLocationName(locationName) {
-    const translations = {
-        "Beijing": "北京",
-        "Shanghai": "上海",
-        "Guangzhou": "广州",
-        "Shenzhen": "深圳",
-        "Baoding":"保定",
-        "Shijiazhuang": "石家庄",
-        "Chengdu": "成都",
-        "Wuhan": "武汉",
-        "Nanjing": "南京",
-        "Hangzhou": "杭州",
-        "Tianjin": "天津",
-        "Kunming": "昆明",
-        "Changsha": "长沙",
-        "Nanning": "南宁",
-        "Harbin": "哈尔滨",
-        "Dalian": "大连",
-        "Qingdao": "青岛",
-        "Jinan": "济南",
-        "Xian": "西安",
-        "Lanzhou": "兰州",
-        "Zhengzhou": "郑州",
-        "Changchun": "长春",
-        "Nanchang": "南昌",
-        "Fuzhou": "福州",
-        "Dandong": "丹东",
-        "Suzhou": "苏州",
-        "Wuxi": "无锡",
-        "Changzhou": "常州",
-        "Xiamen": "厦门",
-        "Kunshan": "昆山",
-        "Ningbo": "宁波",
-        "Urumqi": "乌鲁木齐",
-        "Taiyuan": "太原",
-        // 可以添加更多的城市映射
-    };
-    return translations[locationName] || locationName; // 返回翻译后的城市名，如果没有找到，则返回原名
+function getDetailedLocation(latitude, longitude) {
+    fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=zh-hans`)
+        .then(response => response.json())
+        .then(data => {
+            const detailedLocation = data.locality || data.principalSubdivision || "位置不可用";
+            getWeather(latitude, longitude, detailedLocation); // 调用获取天气数据的函数，同时传递详细位置
+        })
+        .catch(error => {
+            console.error("获取详细位置失败:", error);
+            document.getElementById("weather").innerHTML = "获取位置失败";
+        });
 }
 
-// 获取天气信息
-function getWeather(latitude, longitude) {
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                getDetailedLocation(latitude, longitude); // 获取详细位置
+            },
+            (error) => {
+                console.error("获取位置失败:", error);
+                document.getElementById("weather").innerHTML = "获取位置失败";
+            }
+        );
+    } else {
+        console.error("浏览器不支持地理位置服务");
+        document.getElementById("weather").innerHTML = "浏览器不支持地理位置服务";
+    }
+}
+
+function getWeather(latitude, longitude, detailedLocation) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&lang=zh&units=metric`)
         .then(response => {
             if (!response.ok) {
@@ -272,37 +262,14 @@ function getWeather(latitude, longitude) {
             const temperature = Math.round(data.main.temp);
             const weatherDescription = data.weather[0].description;
 
-            // 获取城市名称
-            const cityName = data.name; // 默认城市名称
-            const translatedCityName = translateLocationName(cityName); // 翻译城市名称
-
-            const weatherInfo = `当前位置: ${translatedCityName}<br>当前温度: ${temperature}°C<br>天气状况: ${weatherDescription}`;
+            // 更新天气信息
+            const weatherInfo = `当前位置: ${detailedLocation}<br>当前温度: ${temperature}°C<br>天气状况: ${weatherDescription}`;
             document.getElementById("weather").innerHTML = weatherInfo; // 更新天气信息
         })
         .catch(error => {
             console.error("获取天气失败:", error);
             document.getElementById("weather").innerHTML = "获取天气失败"; // 显示失败信息
         });
-}
-
-// 获取位置信息
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                getWeather(latitude, longitude); // 调用获取天气数据的函数
-            },
-            (error) => {
-                console.error("获取位置失败:", error);
-                document.getElementById("weather").innerHTML = "获取位置失败";
-            }
-        );
-    } else {
-        console.error("浏览器不支持地理位置服务");
-        document.getElementById("weather").innerHTML = "浏览器不支持地理位置服务";
-    }
 }
 
         function performSearch() {
