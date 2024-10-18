@@ -81,7 +81,6 @@
         border-radius: 50%;
         pointer-events: none; /* 不占用鼠标事件 */
         animation: fall linear infinite;
-        z-index: 9999; /* 放在最上层 */
       }
       @keyframes fall {
         0% {
@@ -164,16 +163,16 @@
     <div class="nav">
       <ul class="navlist">
         <li class="btli">
-          <a href="#">日记</a>
+          <a href="#">娱乐</a>
           <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
-            <li><a href="#">下拉框</a></li>
+            <li><a href="https://www.huya.com/">虎牙直播</a></li>
+            <li><a href="https://www.douyu.com/">斗鱼直播</a></li>
+            <li><a href="https://www.douyin.com/">抖音</a></li>
+            <li><a href="https://www.bilibili.com/">哔哩哔哩</a></li>
           </ul>
         </li>
         <li class="btli">
-          <a href="#">娱乐</a>
+          <a href="#">日记</a>
           <ul class="droplist">
             <li><a href="#">下拉框</a></li>
             <li><a href="#">下拉框</a></li>
@@ -193,7 +192,7 @@
         <li class="btli">
           <a href="#">生活</a>
           <ul class="droplist">
-            <li><a href="#">下拉框</a></li>
+          <li><a href="#">下拉框</a></li>
             <li><a href="#">下拉框</a></li>
             <li><a href="#">下拉框</a></li>
             <li><a href="#">下拉框</a></li>
@@ -211,102 +210,124 @@
       </ul>
     </div>
     <div id="div">
+      <div id="timeDisplay"><span id="currentTime"></span></div>
       <div id="weather"></div>
+      <div id="location"></div>
     </div>
-    <iframe src="lfs.html" style="width: 100%; height: 800px; border: none; background: transparent;position: relative;top: 250px;left: 595px;"></iframe>
-
+    <iframe src="lfs.html" style="width: 100%; height: 800px; position: absolute; top: 300px; left: 595px; z-index: 1; border: none; background: transparent;">  </iframe>
     <script>
-      function myDate() {
-        try {
-          var now = new Date();
-          var formattedDate =
-            now.getFullYear() +
-            "年" +
-            (now.getMonth() + 1) +
-            "月" +
-            now.getDate() +
-            "日 " +
-            now.getHours() +
-            " : " +
-            now.getMinutes() +
-            " : " +
-            now.getSeconds();
+const apiKey = "7a8a07876898ed17efe475981824d003"; // 替换为您的API密钥
 
-          // 更新日期信息
-          document.getElementById("div").childNodes[0].nodeValue =
-            formattedDate; // 只更新时钟部分
-          // 获取天气信息
-          getWeather(); // 执行获取天气信息的函数
-        } catch (error) {
-          console.error("获取日期失败:", error);
-          document.getElementById("weather").innerHTML = "获取日期失败"; // 只更新天气部分
-        }
-      }
-
-      function getWeather() {
-        const apiKey = "7a8a07876898ed17efe475981824d003"; // 替换为您的API密钥
-        const city = "beijing"; // 替换为您的城市名
-
-        // 使用fetch从天气API获取数据
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=zh&units=metric`
-        )
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("网络响应不是OK");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            const temperature = Math.round(data.main.temp); // 取整温度
-            const weatherDescription = data.weather[0].description; // 获取天气描述
-            const weatherInfo = `当前温度: ${temperature}°C<br>天气状况: ${weatherDescription}`;
-            document.getElementById("weather").innerHTML = weatherInfo; // 只更新天气信息部分
-          })
-          .catch((error) => {
-            console.error("获取天气失败:", error);
-            document.getElementById("weather").innerHTML = "获取天气失败"; // 显示失败信息
-          });
-      }
-      // 下雪效果生成
-      function createSnowFlakes() {
-        const snowFlakeCount = 100; // 雪花数量
-        for (let i = 0; i < snowFlakeCount; i++) {
-          setTimeout(createSnowFlake, i * 100); // 每100毫秒生成一颗雪花
-        }
-      }
-
-      function createSnowFlake() {
-        const snowFlake = document.createElement("div");
-        snowFlake.classList.add("snow");
-        document.body.appendChild(snowFlake);
-
-        // 随机位置和动画持续时间
-        snowFlake.style.left = Math.random() * window.innerWidth + "px";
-        snowFlake.style.animationDuration = Math.random() * 3 + 2 + "s";
-        snowFlake.style.opacity = Math.random() * 0.5 + 0.5; // 随机透明度
-
-        // 动画结束后移除雪花
-        snowFlake.addEventListener("animationend", function () {
-          this.remove();
-        });
-      }
-function performSearch() {
-  const query = document.getElementById("searchInput").value; // 获取搜索框的内容
-  if (query) {
-    // 使用百度搜索
-    window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, '_blank');
-  } else {
-    alert("请输入搜索内容");
-  }
+// 翻译位置名称
+function translateLocationName(locationName) {
+    const translations = {
+        "Beijing": "北京",
+        "Shanghai": "上海",
+        "Guangzhou": "广州",
+        "Shenzhen": "深圳",
+        "Dayangfang":"大羊坊"
+        // 可以添加更多的城市映射
+    };
+    return translations[locationName] || locationName; // 返回翻译后的城市名，如果没有找到，则返回原名
 }
 
+// 获取天气信息
+function getWeather(latitude, longitude) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&lang=zh&units=metric`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("天气API响应失败");
+            }
+            return response.json();
+        })
+        .then(data => {
+            const temperature = Math.round(data.main.temp);
+            const weatherDescription = data.weather[0].description;
 
-      window.onload = function () {
-        myDate(); // 页面加载完成后调用
-        setInterval(myDate, 1000); // 每秒更新一次时钟
-        createSnowFlakes(); // 创建雪花
-      };
+            // 获取城市名称
+            const cityName = data.name; // 默认城市名称
+            const translatedCityName = translateLocationName(cityName); // 翻译城市名称
+
+            const weatherInfo = `当前位置: ${translatedCityName}<br>当前温度: ${temperature}°C<br>天气状况: ${weatherDescription}`;
+            document.getElementById("weather").innerHTML = weatherInfo; // 更新天气信息
+        })
+        .catch(error => {
+            console.error("获取天气失败:", error);
+            document.getElementById("weather").innerHTML = "获取天气失败"; // 显示失败信息
+        });
+}
+
+// 获取位置信息
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                getWeather(latitude, longitude); // 调用获取天气数据的函数
+            },
+            (error) => {
+                console.error("获取位置失败:", error);
+                document.getElementById("weather").innerHTML = "获取位置失败";
+            }
+        );
+    } else {
+        console.error("浏览器不支持地理位置服务");
+        document.getElementById("weather").innerHTML = "浏览器不支持地理位置服务";
+    }
+}
+
+        function performSearch() {
+            const query = document.getElementById("searchInput").value; // 获取搜索框的内容
+            if (query) {
+                window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, '_blank');
+            } else {
+                alert("请输入搜索内容");
+            }
+        }
+
+        function myDate() {
+            const now = new Date();
+            const formattedDate = 
+                now.getFullYear() + "年" +
+                (now.getMonth() + 1) + "月" +
+                now.getDate() + "日 " +
+                now.getHours() + " : " +
+                now.getMinutes() + " : " +
+                now.getSeconds();
+
+            // 更新时间信息
+            document.getElementById("currentTime").innerText = formattedDate; // 更新当前时间的显示
+        }
+
+        function createSnowFlakes() {
+            const snowFlakeCount = 100; // 雪花数量
+            for (let i = 0; i < snowFlakeCount; i++) {
+                setTimeout(createSnowFlake, i * 100); // 每100毫秒生成一颗雪花
+            }
+        }
+
+        function createSnowFlake() {
+            const snowFlake = document.createElement("div");
+            snowFlake.classList.add("snow");
+            document.body.appendChild(snowFlake);
+
+            // 随机位置和动画持续时间
+            snowFlake.style.left = Math.random() * window.innerWidth + "px";
+            snowFlake.style.animationDuration = Math.random() * 3 + 2 + "s";
+            snowFlake.style.opacity = Math.random() * 0.5 + 0.5; // 随机透明度
+
+            // 动画结束后移除雪花
+            snowFlake.addEventListener("animationend", function () {
+                this.remove();
+            });
+        }
+
+        window.onload = function () {
+            getLocation(); // 页面加载完成后获取位置
+            setInterval(myDate, 1000); // 每秒更新一次时钟
+            createSnowFlakes(); // 创建雪花
+        };
     </script>
   </body>
 </html>
